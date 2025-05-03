@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">My contacts</string>
     <string name="no_name">Без имени</string>
+    <string name="cant_read_contacts">Невозможно получить список контактов. Необходимо предоставить разрешение на чтение.</string>
+    <string name="grant_access">Разрешить доступ</string>
 </resources>

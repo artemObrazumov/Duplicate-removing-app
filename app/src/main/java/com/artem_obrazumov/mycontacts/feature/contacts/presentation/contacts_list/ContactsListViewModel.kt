@@ -8,27 +8,41 @@ import com.artem_obrazumov.mycontacts.core.presentation.view_model.StatefulViewM
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.Contact
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.groupByFirstLetter
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetContactsUseCase
+import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetReadContactsPermissionUseCase
 import kotlinx.coroutines.launch
 
 class ContactsListViewModel(
-    private val getContactsUseCase: GetContactsUseCase
+    private val getContactsUseCase: GetContactsUseCase,
+    private val getReadContactsPermissionUseCase: GetReadContactsPermissionUseCase
 ) : StatefulViewModel<ContactsListState, ContactsListAction, ContactsListEffect>(
     ContactsListState.Loading
 ) {
 
     init {
-        loadContacts()
+        tryLoadContacts()
     }
 
-    private fun loadContacts() {
+    private fun tryLoadContacts() {
         viewModelScope.launch {
+            updateState(ContactsListState.Loading)
+            if (!getReadContactsPermissionUseCase()) {
+                updateState(ContactsListState.ContactsUnavailable)
+                return@launch
+            }
             val contacts = getContactsUseCase()
             updateState(ContactsListState.Content(contacts.groupByFirstLetter()))
         }
     }
 
     override fun onAction(action: ContactsListAction) {
+        when (action) {
+            ContactsListAction.RefreshContacts -> {
+                tryLoadContacts()
+            }
+            ContactsListAction.RemoveDuplicates -> {
 
+            }
+        }
     }
 }
 
@@ -38,10 +52,12 @@ sealed class ContactsListState : State {
     data class Content(
         val groupedContacts: Map<Char, List<Contact>>
     ) : ContactsListState()
+    data object ContactsUnavailable: ContactsListState()
 }
 
 sealed class ContactsListAction : Action {
 
+    data object RefreshContacts : ContactsListAction()
     data object RemoveDuplicates : ContactsListAction()
 }
 

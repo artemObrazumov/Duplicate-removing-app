@@ -25,6 +25,9 @@ fun NavGraphBuilder.contactsGraph(
             contactsListScreenComponent.contactsListViewModel
         }
         val state by viewModel.state.collectAsState()
-        ContactsListScreen(state = state)
+        ContactsListScreen(
+            state = state,
+            onAction = viewModel::onAction
+        )
     }
 }
