@@ -37,7 +37,7 @@ fun ContactItem(
         )
 
         Column {
-            val mainPhoneNumber = remember { contact.phoneNumbers.first().toString() }
+            val mainPhoneNumber = remember { contact.phoneNumbers.firstOrNull()?.number ?: "" }
             Text(text = contact.name.resolve(), style = MaterialTheme.typography.bodyLarge)
             Text(text = mainPhoneNumber, style = MaterialTheme.typography.bodyMedium)
         }
