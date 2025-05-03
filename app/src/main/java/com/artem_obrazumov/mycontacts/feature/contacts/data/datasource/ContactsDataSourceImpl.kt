@@ -19,7 +19,7 @@ class ContactsDataSourceImpl(
         context.contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             null,
-            "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?",
+            "${ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID} = ?",
             arrayOf(id.toString()),
             null
         )?.use { cursor ->
@@ -39,13 +39,17 @@ class ContactsDataSourceImpl(
 
     override suspend fun getContacts(): List<Contact> = withContext(Dispatchers.IO) {
         val contacts = mutableListOf<Contact>()
-        val uri = ContactsContract.Contacts.CONTENT_URI
+        val contactsSet = mutableSetOf<Contact>()
+        val uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
         val projection = arrayOf(
-            ContactsContract.Contacts._ID,
-            ContactsContract.Contacts.DISPLAY_NAME,
-            ContactsContract.Contacts.PHOTO_URI
+            ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+            ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID,
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+            ContactsContract.CommonDataKinds.Phone.NUMBER,
+            ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
+            ContactsContract.CommonDataKinds.Phone.TYPE
         )
-        val sortOrder = "${ContactsContract.Contacts.DISPLAY_NAME} ASC"
+        val sortOrder = "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC"
 
         val contentResolver = context.contentResolver
         contentResolver.query(uri, projection, null, null,
@@ -53,17 +57,22 @@ class ContactsDataSourceImpl(
             while (cursor.moveToNext()) {
                 try {
                     val id = cursor.getLong(
-                        cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID)
+                        cursor.getColumnIndexOrThrow(
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID
+                        )
                     )
                     val name = cursor.getString(
-                        cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME)
+                        cursor.getColumnIndexOrThrow(
+                            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+                        )
                     )
                     val photoUri = cursor.getString(
-                        cursor.getColumnIndexOrThrow(ContactsContract.Contacts.PHOTO_URI)
+                        cursor.getColumnIndexOrThrow(
+                            ContactsContract.CommonDataKinds.Phone.PHOTO_URI
+                        )
                     )
                     val phoneNumbers = getPhoneNumbersForContact(id)
-
-                    contacts.add(Contact(
+                    val contact = Contact(
                         id = id,
                         name = if (name == null) {
                             StringResource.FromResource(R.string.no_name)
@@ -72,7 +81,14 @@ class ContactsDataSourceImpl(
                         },
                         photoUri = photoUri,
                         phoneNumbers = phoneNumbers
-                    ))
+                    )
+                    if (contact in contactsSet) {
+                        contact.isDuplicate = true
+                    } else {
+                        contactsSet.add(contact)
+                    }
+
+                    contacts.add(contact)
                 } catch (e: Exception) {
                     // TODO: proper error logging
                     e.printStackTrace()

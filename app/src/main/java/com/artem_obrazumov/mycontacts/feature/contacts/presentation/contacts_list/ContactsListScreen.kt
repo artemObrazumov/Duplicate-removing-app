@@ -5,8 +5,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -65,6 +65,8 @@ fun ContactsListScreenContent(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        contentPadding = PaddingValues(vertical = 8.dp)
     ) {
         groupedContacts.forEach { (letter, contacts) ->
             stickyHeader {
@@ -72,7 +74,11 @@ fun ContactsListScreenContent(
             }
 
             items(contacts) { contact ->
-                ContactItem(contact = contact)
+                ContactItem(
+                    contact = contact,
+                    modifier = Modifier
+                        .padding(start = 24.dp)
+                )
             }
         }
     }

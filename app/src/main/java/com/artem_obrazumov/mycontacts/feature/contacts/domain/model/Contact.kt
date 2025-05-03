@@ -8,6 +8,8 @@ data class Contact(
     val photoUri: String?,
     val phoneNumbers: List<PhoneNumber>
 ) {
+    var isDuplicate: Boolean = false
+
     @JvmInline
     value class PhoneNumber(
         val number: String
