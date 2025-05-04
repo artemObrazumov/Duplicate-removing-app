@@ -5,15 +5,17 @@ import android.provider.ContactsContract
 import com.artem_obrazumov.mycontacts.R
 import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.datasource.ContactsDataSource
 import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model.Contact
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.utils.ContactsError
+import com.artem_obrazumov.mycontacts.core.domain.Result
 import com.artem_obrazumov.mycontacts.core.domain.StringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class ContactsDataSourceImpl(
     private val context: Context
-): ContactsDataSource {
+) : ContactsDataSource {
 
-    private fun getAllContacts(): List<Contact> {
+    private fun getAllContacts(): Result<List<Contact>, ContactsError> {
         val contacts = mutableListOf<Contact>()
         val uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
         val projection = arrayOf(
@@ -27,8 +29,10 @@ class ContactsDataSourceImpl(
         val sortOrder = "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC"
 
         val contentResolver = context.contentResolver
-        contentResolver.query(uri, projection, null, null,
-            sortOrder)?.use { cursor ->
+        contentResolver.query(
+            uri, projection, null, null,
+            sortOrder
+        )?.use { cursor ->
             while (cursor.moveToNext()) {
                 try {
                     val id = cursor.getLong(
@@ -65,12 +69,11 @@ class ContactsDataSourceImpl(
                     )
                     contacts.add(contact)
                 } catch (e: Exception) {
-                    // TODO: proper error logging
-                    e.printStackTrace()
+                    return Result.Failure(ContactsError.GettingContactsError)
                 }
             }
         }
-        return contacts
+        return Result.Success(contacts)
     }
 
     private fun markDuplicates(contacts: List<Contact>) {
@@ -108,7 +111,29 @@ class ContactsDataSourceImpl(
         return numbers
     }
 
-    override suspend fun getContacts(): List<Contact> = withContext(Dispatchers.IO) {
-        return@withContext getAllContacts().apply { markDuplicates(this) }
+    override suspend fun getContacts(): Result<List<Contact>, ContactsError> {
+        return withContext(Dispatchers.IO) {
+            when (val getContactsResult = getAllContacts()) {
+                is Result.Failure -> {
+                    Result.Failure(getContactsResult.error)
+                }
+                is Result.Success -> {
+                    Result.Success(getContactsResult.data.apply { markDuplicates(this) })
+                }
+            }
+        }
+    }
+
+    override suspend fun removeContact(id: Long): Result<Unit, ContactsError> {
+        val rows = context.contentResolver.delete(
+            ContactsContract.RawContacts.CONTENT_URI,
+            "${ContactsContract.RawContacts._ID} = ?",
+            arrayOf(id.toString())
+        )
+        return if (rows == 0) {
+            Result.Failure(ContactsError.RemovingError)
+        } else {
+            Result.Success(Unit)
+        }
     }
 }

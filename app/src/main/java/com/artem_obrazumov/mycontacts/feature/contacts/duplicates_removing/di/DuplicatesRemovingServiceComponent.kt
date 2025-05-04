@@ -1,6 +1,6 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.di
+package com.artem_obrazumov.mycontacts.feature.contacts.duplicates_removing.di
 
-import com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.DuplicateRemovingService
+import com.artem_obrazumov.mycontacts.feature.contacts.duplicates_removing.DuplicateCleaningService
 import dagger.Subcomponent
 
 @DuplicatesRemovingServiceScope
@@ -12,5 +12,5 @@ interface DuplicatesRemovingServiceComponent {
         fun create(): DuplicatesRemovingServiceComponent
     }
 
-    fun inject(duplicateRemovingService: DuplicateRemovingService)
+    fun inject(duplicateCleaningService: DuplicateCleaningService)
 }

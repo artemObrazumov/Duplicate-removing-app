@@ -1,4 +1,4 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.di
+package com.artem_obrazumov.mycontacts.feature.contacts.duplicates_removing.di
 
 import javax.inject.Scope
 

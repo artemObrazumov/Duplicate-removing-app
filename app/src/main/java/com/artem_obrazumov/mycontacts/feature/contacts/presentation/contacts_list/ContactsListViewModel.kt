@@ -4,72 +4,205 @@ import androidx.lifecycle.viewModelScope
 import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model.Contact
 import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model.groupByFirstLetter
 import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase.GetContactsUseCase
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase.GetContactsUseCaseResult
 import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase.GetReadWriteContactsPermissionUseCase
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.utils.ContactsError
 import com.artem_obrazumov.mycontacts.core.presentation.view_model.Action
 import com.artem_obrazumov.mycontacts.core.presentation.view_model.Effect
 import com.artem_obrazumov.mycontacts.core.presentation.view_model.State
 import com.artem_obrazumov.mycontacts.core.presentation.view_model.StatefulViewModel
+import com.artem_obrazumov.mycontacts.feature.contacts.presentation.model.CleaningResult
 import kotlinx.coroutines.launch
 
 class ContactsListViewModel(
     private val getContactsUseCase: GetContactsUseCase,
     private val getReadWriteContactsPermissionUseCase: GetReadWriteContactsPermissionUseCase
-) : StatefulViewModel<ContactsListState, ContactsListAction, ContactsListEffect>(
-    ContactsListState.Loading
+) : StatefulViewModel<ContactsListScreenState, ContactsListScreenAction, ContactsListScreenEffect>(
+    ContactsListScreenState.Loading
 ) {
+
+    private var contactsListState: ContactsListScreenState.ContactsListState =
+        ContactsListScreenState.ContactsListState.Loading
+    private var duplicatesCleanerServiceState: ContactsListScreenState.DuplicatesCleanerServiceState =
+        ContactsListScreenState.DuplicatesCleanerServiceState.Hidden
 
     init {
         tryLoadContacts()
     }
 
+    private suspend fun updateContentState() {
+        updateState(ContactsListScreenState.Content(
+            contactsListState,
+            duplicatesCleanerServiceState
+        ))
+    }
+
     private fun tryLoadContacts() {
         viewModelScope.launch {
-            updateState(ContactsListState.Loading)
+            contactsListState = ContactsListScreenState.ContactsListState.Loading
+            updateContentState()
             if (!getReadWriteContactsPermissionUseCase()) {
-                updateState(ContactsListState.ContactsUnavailable)
+                updateState(ContactsListScreenState.ContactsUnavailable)
                 return@launch
             }
-            val contacts = getContactsUseCase()
-            updateState(ContactsListState.Content(contacts.groupByFirstLetter()))
+            contactsListState = when(val result = getContactsUseCase()) {
+                is GetContactsUseCaseResult.Failure -> {
+                    ContactsListScreenState.ContactsListState
+                        .Failure(result.error)
+                }
+
+                is GetContactsUseCaseResult.Success -> {
+                    showServiceItemIfHidden()
+                    ContactsListScreenState.ContactsListState
+                        .Content(result.contacts.groupByFirstLetter())
+                }
+            }
+            updateContentState()
+        }
+    }
+
+    private fun showServiceItemIfHidden() {
+        viewModelScope.launch {
+            if (duplicatesCleanerServiceState is
+                        ContactsListScreenState.DuplicatesCleanerServiceState.Hidden) {
+                duplicatesCleanerServiceState =
+                    ContactsListScreenState.DuplicatesCleanerServiceState
+                        .Idle()
+            }
         }
     }
 
     private fun startDuplicatesCleaningService() {
         viewModelScope.launch {
-            updateEffect(ContactsListEffect.StartDuplicatesCleaningService)
+            updateEffect(ContactsListScreenEffect.StartDuplicatesCleaningService)
         }
     }
 
-    override fun onAction(action: ContactsListAction) {
+    override fun onAction(action: ContactsListScreenAction) {
         when (action) {
-            ContactsListAction.RefreshContacts -> {
+            ContactsListScreenAction.RefreshContactsScreen -> {
                 tryLoadContacts()
             }
 
-            ContactsListAction.RemoveDuplicates -> {
+            ContactsListScreenAction.RemoveDuplicates -> {
                 startDuplicatesCleaningService()
             }
+
+            is ContactsListScreenAction.ShowCleaningStarted -> {
+                showCleaningStarted(action.duplicates)
+            }
+
+            is ContactsListScreenAction.ShowCleaningProgress -> {
+                updateCleaningProgress(action.progress, action.total)
+            }
+
+            is ContactsListScreenAction.ShowCleaningFinished -> {
+                showCleaningIdle(
+                    cleaningResult = CleaningResult(
+                        removed = action.removed,
+                        total = action.total
+                    ),
+                    errors = action.errors
+                )
+                tryLoadContacts()
+            }
+
+            is ContactsListScreenAction.ShowCleaningCancelled -> {
+                showCleaningIdle(
+                    errors = listOf(action.error)
+                )
+            }
+        }
+    }
+
+    private fun updateCleaningProgress(progress: Int, total: Int) {
+        viewModelScope.launch {
+            duplicatesCleanerServiceState = ContactsListScreenState.DuplicatesCleanerServiceState
+                .Process(progress, total)
+            updateContentState()
+        }
+    }
+
+    private fun showCleaningStarted(duplicates: Int) {
+        viewModelScope.launch {
+            duplicatesCleanerServiceState = ContactsListScreenState.DuplicatesCleanerServiceState
+                .CleaningStarted(duplicates)
+            updateContentState()
+        }
+    }
+
+    private fun showCleaningIdle(
+        cleaningResult: CleaningResult? = null,
+        errors: List<ContactsError> = emptyList()
+    ) {
+        viewModelScope.launch {
+            duplicatesCleanerServiceState = ContactsListScreenState.DuplicatesCleanerServiceState
+                .Idle(cleaningResult, errors)
+            updateContentState()
         }
     }
 }
 
-sealed class ContactsListState : State {
+sealed class ContactsListScreenState : State {
 
-    data object Loading : ContactsListState()
+    data object Loading : ContactsListScreenState()
     data class Content(
-        val groupedContacts: Map<Char, List<Contact>>
-    ) : ContactsListState()
+        val contactsListState: ContactsListState,
+        val duplicatesCleanerServiceState: DuplicatesCleanerServiceState
+    ) : ContactsListScreenState()
 
-    data object ContactsUnavailable : ContactsListState()
+    data object ContactsUnavailable : ContactsListScreenState()
+
+    sealed class ContactsListState {
+
+        data object Loading : ContactsListState()
+        data class Content(
+            val groupedContacts: Map<Char, List<Contact>>
+        ) : ContactsListState()
+        data class Failure(
+            val error: ContactsError
+        ) : ContactsListState()
+    }
+
+    sealed class DuplicatesCleanerServiceState {
+
+        data object Hidden : DuplicatesCleanerServiceState()
+        data class Idle(
+            val cleaningResult: CleaningResult? = null,
+            val errors: List<ContactsError> = emptyList()
+        ) : DuplicatesCleanerServiceState()
+        data class CleaningStarted(
+            val duplicates: Int
+        ) : DuplicatesCleanerServiceState()
+        data class Process(
+            val contactsDeleted: Int,
+            val total: Int
+        ) : DuplicatesCleanerServiceState()
+    }
 }
 
-sealed class ContactsListAction : Action {
+sealed class ContactsListScreenAction : Action {
 
-    data object RefreshContacts : ContactsListAction()
-    data object RemoveDuplicates : ContactsListAction()
+    data object RefreshContactsScreen : ContactsListScreenAction()
+    data object RemoveDuplicates : ContactsListScreenAction()
+    data class ShowCleaningStarted(
+        val duplicates: Int
+    ) : ContactsListScreenAction()
+    data class ShowCleaningProgress(
+        val progress: Int,
+        val total: Int
+    ) : ContactsListScreenAction()
+    data class ShowCleaningFinished(
+        val removed: Int,
+        val total: Int,
+        val errors: List<ContactsError>
+    ) : ContactsListScreenAction()
+    data class ShowCleaningCancelled(
+        val error: ContactsError
+    ) : ContactsListScreenAction()
 }
 
-sealed class ContactsListEffect : Effect {
+sealed class ContactsListScreenEffect : Effect {
 
-    data object StartDuplicatesCleaningService : ContactsListEffect()
+    data object StartDuplicatesCleaningService : ContactsListScreenEffect()
 }

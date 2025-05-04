@@ -2,7 +2,6 @@ package com.artem_obrazumov.mycontacts.app.di
 
 import android.content.Context
 import com.artem_obrazumov.mycontacts.feature.contacts.presentation.di.ContactsFeatureComponent
-import com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.DuplicateRemovingService
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

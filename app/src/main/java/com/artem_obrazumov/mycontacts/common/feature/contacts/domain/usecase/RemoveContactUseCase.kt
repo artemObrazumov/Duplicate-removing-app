@@ -1,32 +1,29 @@
 package com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase
 
-import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model.Contact
 import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.repository.ContactsRepository
 import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.utils.ContactsError
 import com.artem_obrazumov.mycontacts.core.domain.Result
 
-class GetContactsUseCase(
+class RemoveContactUseCase(
     private val contactsRepository: ContactsRepository
 ) {
 
-    suspend operator fun invoke(): GetContactsUseCaseResult {
-        return when(val result = contactsRepository.getContacts()) {
+    suspend operator fun invoke(id: Long): RemoveContactUseCaseResult {
+        return when(val result = contactsRepository.removeContact(id)) {
             is Result.Failure -> {
-                GetContactsUseCaseResult.Failure(result.error)
+                RemoveContactUseCaseResult.Failure(result.error)
             }
             is Result.Success -> {
-                GetContactsUseCaseResult.Success(result.data)
+                RemoveContactUseCaseResult.Success
             }
         }
     }
 }
 
-sealed class GetContactsUseCaseResult {
+sealed class RemoveContactUseCaseResult {
 
-    data class Success(
-        val contacts: List<Contact>
-    ) : GetContactsUseCaseResult()
     data class Failure(
         val error: ContactsError
-    ) : GetContactsUseCaseResult()
+    ): RemoveContactUseCaseResult()
+    data object Success : RemoveContactUseCaseResult()
 }

@@ -6,7 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.artem_obrazumov.mycontacts.core.presentation.di.daggerViewModel
-import com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list.ContactsListEffect
+import com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list.ContactsListScreenEffect
 import com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list.ContactsListScreen
 import com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list.ContactsListViewModel
 import com.artem_obrazumov.mycontacts.feature.contacts.presentation.di.ContactsFeatureComponentProvider
@@ -30,7 +30,7 @@ fun NavGraphBuilder.contactsGraph(
         ContactsListScreen(
             state = state,
             onAction = viewModel::onAction,
-            effectFlow = viewModel.effect as SharedFlow<ContactsListEffect>
+            effectFlow = viewModel.effect as SharedFlow<ContactsListScreenEffect>
         )
     }
 }

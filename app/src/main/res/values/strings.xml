@@ -4,4 +4,11 @@
     <string name="cant_read_write_contacts">Невозможно получить список контактов. Необходимо предоставить разрешение на чтение и запись.</string>
     <string name="grant_access">Разрешить доступ</string>
     <string name="duplicate">Дубликат</string>
+    <string name="clean_duplicates">Очистить дубликаты</string>
+    <string name="started_cleaning">Начинается очистка контактов: %1$d</string>
+    <string name="contacts_deleted">Очистка контактов: %1$d/%2$d</string>
+    <string name="duplicates_not_found_error">Ошибка: дубликаты не найдены</string>
+    <string name="contact_removing_error">Ошибка: не удалось удалить контакт</string>
+    <string name="getting_contacts_error">Ошибка: не удалось получить контакт</string>
+    <string name="cleaned_duplicates">Очищено дубликатов: %1$d/%2$d</string>
 </resources>

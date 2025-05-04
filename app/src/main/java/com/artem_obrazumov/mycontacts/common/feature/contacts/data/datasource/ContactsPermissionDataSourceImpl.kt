@@ -10,15 +10,11 @@ class ContactsPermissionDataSourceImpl(
     private val context: Context
 ) : ContactsPermissionDataSource {
 
-    override suspend fun getReadContactsPermission(): Boolean {
+    override suspend fun getReadWriteContactsPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.READ_CONTACTS
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    override suspend fun getWriteContactsPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
+        ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.WRITE_CONTACTS
         ) == PackageManager.PERMISSION_GRANTED

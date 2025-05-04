@@ -7,6 +7,6 @@ class GetReadWriteContactsPermissionUseCase(
 ) {
 
     suspend operator fun invoke(): Boolean {
-        return contactsRepository.getReadContactsPermission()
+        return contactsRepository.getReadWriteContactsPermission()
     }
 }

@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".feature.contacts.presentation.duplicates_removing.DuplicateRemovingService"
+            android:name=".feature.contacts.duplicates_removing.DuplicateCleaningService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
