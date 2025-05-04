@@ -8,12 +8,19 @@ import com.artem_obrazumov.mycontacts.feature.contacts.domain.datasource.Contact
 
 class ContactsPermissionDataSourceImpl(
     private val context: Context
-): ContactsPermissionDataSource {
+) : ContactsPermissionDataSource {
 
     override suspend fun getReadContactsPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.READ_CONTACTS
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override suspend fun getWriteContactsPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.WRITE_CONTACTS
         ) == PackageManager.PERMISSION_GRANTED
     }
 }

@@ -2,7 +2,7 @@ package com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_li
 
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.repository.ContactsRepository
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetContactsUseCase
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetReadContactsPermissionUseCase
+import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetReadWriteContactsPermissionUseCase
 import dagger.Module
 import dagger.Provides
 
@@ -18,5 +18,5 @@ class UseCaseModule {
     @Provides
     fun provideGetReadContactsPermissionUseCase(
         contactsRepository: ContactsRepository
-    ): GetReadContactsPermissionUseCase = GetReadContactsPermissionUseCase(contactsRepository)
+    ): GetReadWriteContactsPermissionUseCase = GetReadWriteContactsPermissionUseCase(contactsRepository)
 }

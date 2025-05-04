@@ -17,4 +17,8 @@ class ContactsRepositoryImpl(
     override suspend fun getReadContactsPermission(): Boolean {
         return contactsPermissionDataSource.getReadContactsPermission()
     }
+
+    override suspend fun getWriteContactsPermission(): Boolean {
+        return contactsPermissionDataSource.getWriteContactsPermission()
+    }
 }

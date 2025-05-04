@@ -1,4 +1,4 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.data.di
+package com.artem_obrazumov.mycontacts.feature.contacts.presentation.di
 
 import android.content.Context
 import com.artem_obrazumov.mycontacts.feature.contacts.data.datasource.ContactsDataSourceImpl
@@ -7,7 +7,6 @@ import com.artem_obrazumov.mycontacts.feature.contacts.data.repository.ContactsR
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.datasource.ContactsDataSource
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.datasource.ContactsPermissionDataSource
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.repository.ContactsRepository
-import com.artem_obrazumov.mycontacts.feature.contacts.presentation.di.ContactsFeatureScope
 import dagger.Module
 import dagger.Provides
 

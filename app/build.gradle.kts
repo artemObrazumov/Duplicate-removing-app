@@ -38,6 +38,12 @@ android {
     }
     buildFeatures {
         compose = true
+        aidl = true
+    }
+    sourceSets {
+        getByName("main") {
+            aidl.setSrcDirs(listOf("src/main/java"))
+        }
     }
 }
 

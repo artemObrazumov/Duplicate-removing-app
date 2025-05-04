@@ -8,12 +8,12 @@ import com.artem_obrazumov.mycontacts.core.presentation.view_model.StatefulViewM
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.Contact
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.groupByFirstLetter
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetContactsUseCase
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetReadContactsPermissionUseCase
+import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetReadWriteContactsPermissionUseCase
 import kotlinx.coroutines.launch
 
 class ContactsListViewModel(
     private val getContactsUseCase: GetContactsUseCase,
-    private val getReadContactsPermissionUseCase: GetReadContactsPermissionUseCase
+    private val getReadWriteContactsPermissionUseCase: GetReadWriteContactsPermissionUseCase
 ) : StatefulViewModel<ContactsListState, ContactsListAction, ContactsListEffect>(
     ContactsListState.Loading
 ) {
@@ -25,7 +25,7 @@ class ContactsListViewModel(
     private fun tryLoadContacts() {
         viewModelScope.launch {
             updateState(ContactsListState.Loading)
-            if (!getReadContactsPermissionUseCase()) {
+            if (!getReadWriteContactsPermissionUseCase()) {
                 updateState(ContactsListState.ContactsUnavailable)
                 return@launch
             }
@@ -34,13 +34,20 @@ class ContactsListViewModel(
         }
     }
 
+    private fun startDuplicatesCleaningService() {
+        viewModelScope.launch {
+            updateEffect(ContactsListEffect.StartDuplicatesCleaningService)
+        }
+    }
+
     override fun onAction(action: ContactsListAction) {
         when (action) {
             ContactsListAction.RefreshContacts -> {
                 tryLoadContacts()
             }
-            ContactsListAction.RemoveDuplicates -> {
 
+            ContactsListAction.RemoveDuplicates -> {
+                startDuplicatesCleaningService()
             }
         }
     }
@@ -52,7 +59,8 @@ sealed class ContactsListState : State {
     data class Content(
         val groupedContacts: Map<Char, List<Contact>>
     ) : ContactsListState()
-    data object ContactsUnavailable: ContactsListState()
+
+    data object ContactsUnavailable : ContactsListState()
 }
 
 sealed class ContactsListAction : Action {
@@ -63,4 +71,5 @@ sealed class ContactsListAction : Action {
 
 sealed class ContactsListEffect : Effect {
 
+    data object StartDuplicatesCleaningService : ContactsListEffect()
 }

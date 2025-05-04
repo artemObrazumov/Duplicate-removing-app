@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <application
         android:name=".app.MyContactsApp"
@@ -26,6 +27,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".feature.contacts.presentation.duplicates_removing.DuplicateRemovingService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.artem_obrazumov.mycontacts.feature.contacts.DUPLICATE_REMOVING_SERVICE" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -1,6 +1,11 @@
 package com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -16,8 +21,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,13 +38,69 @@ import com.artem_obrazumov.mycontacts.core.presentation.screens.LoadingScreen
 import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.Contact
 import com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list.components.ContactItem
 import com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list.components.LetterHeader
+import com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.DuplicateRemovingService
+import com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.DuplicateRemovingServiceCallback
+import com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.IDuplicateRemovingService
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun ContactsListScreen(
     state: ContactsListState,
     modifier: Modifier = Modifier,
-    onAction: (action: ContactsListAction) -> Unit
+    onAction: (action: ContactsListAction) -> Unit,
+    effectFlow: SharedFlow<ContactsListEffect>
 ) {
+    val context = LocalContext.current
+    var service by remember { mutableStateOf<IDuplicateRemovingService?>(null) }
+
+    val callback = remember<DuplicateRemovingServiceCallback> {
+        object : DuplicateRemovingServiceCallback.Stub() {
+            override fun onCleanStarted(duplicates: Int) {
+                println("Started $duplicates")
+            }
+
+            override fun onProgress(progress: Int) {
+                println("Progress: $progress")
+            }
+
+            override fun onCleanCompleted(duplicatesRemoved: Int) {
+                onAction(ContactsListAction.RefreshContacts)
+            }
+        }
+    }
+
+    val serviceConnection = remember {
+        object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+                service = IDuplicateRemovingService.Stub.asInterface(binder)
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+                service = null
+            }
+        }
+    }
+
+    DisposableEffect (Unit) {
+        val intent = Intent(context, DuplicateRemovingService::class.java).apply {
+            action = "com.artem_obrazumov.mycontacts.feature.contacts.DUPLICATE_REMOVING_SERVICE"
+        }
+        context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+
+        onDispose {
+            context.unbindService(serviceConnection)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        effectFlow.collect { effect ->
+            when(effect) {
+                ContactsListEffect.StartDuplicatesCleaningService -> {
+                    service?.startCleanContacts(callback)
+                }
+            }
+        }
+    }
 
     when(state) {
         ContactsListState.Loading -> {
@@ -43,6 +111,7 @@ fun ContactsListScreen(
                 groupedContacts = state.groupedContacts,
                 modifier = modifier
             )
+            Button(onClick = {onAction(ContactsListAction.RemoveDuplicates)}) { Text("start") }
         }
         ContactsListState.ContactsUnavailable -> {
             ContactsUnavailableScreen(
@@ -73,7 +142,10 @@ fun ContactsListScreenContent(
                 LetterHeader(letter = letter)
             }
 
-            items(contacts) { contact ->
+            items(
+                items = contacts,
+                key = { it.rawId }
+            ) { contact ->
                 ContactItem(
                     contact = contact,
                     modifier = Modifier
@@ -90,9 +162,9 @@ fun ContactsUnavailableScreen(
     onPermissionGranted: () -> Unit
 ) {
     val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestMultiplePermissions()
     ) { isGranted ->
-        if (isGranted) onPermissionGranted.invoke()
+        if (isGranted.values.all { it }) onPermissionGranted.invoke()
     }
 
     Column (
@@ -103,7 +175,7 @@ fun ContactsUnavailableScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.cant_read_contacts),
+            text = stringResource(R.string.cant_read_write_contacts),
             textAlign = TextAlign.Center
         )
         Spacer(
@@ -111,7 +183,7 @@ fun ContactsUnavailableScreen(
         )
         Button(
             onClick = {
-                permissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+                permissionLauncher.launch(arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS))
             }
         ) {
             Text(
