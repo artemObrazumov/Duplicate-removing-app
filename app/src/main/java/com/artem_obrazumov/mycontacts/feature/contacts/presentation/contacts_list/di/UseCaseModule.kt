@@ -1,8 +1,8 @@
 package com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list.di
 
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.repository.ContactsRepository
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetContactsUseCase
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetReadWriteContactsPermissionUseCase
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.repository.ContactsRepository
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase.GetContactsUseCase
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase.GetReadWriteContactsPermissionUseCase
 import dagger.Module
 import dagger.Provides
 

@@ -1,4 +1,4 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase
+package com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase
 
 class StartCleaningServiceUseCase {
 

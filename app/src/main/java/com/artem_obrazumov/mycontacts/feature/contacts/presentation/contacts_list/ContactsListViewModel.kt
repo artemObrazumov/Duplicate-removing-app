@@ -1,14 +1,14 @@
 package com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list
 
 import androidx.lifecycle.viewModelScope
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model.Contact
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model.groupByFirstLetter
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase.GetContactsUseCase
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase.GetReadWriteContactsPermissionUseCase
 import com.artem_obrazumov.mycontacts.core.presentation.view_model.Action
 import com.artem_obrazumov.mycontacts.core.presentation.view_model.Effect
 import com.artem_obrazumov.mycontacts.core.presentation.view_model.State
 import com.artem_obrazumov.mycontacts.core.presentation.view_model.StatefulViewModel
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.Contact
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.groupByFirstLetter
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetContactsUseCase
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetReadWriteContactsPermissionUseCase
 import kotlinx.coroutines.launch
 
 class ContactsListViewModel(

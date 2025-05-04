@@ -1,4 +1,4 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.domain.interactor
+package com.artem_obrazumov.mycontacts.common.feature.contacts.domain.interactor
 
 // TODO: remove if not needed
 interface DuplicateCleaningServiceInteractor {

@@ -1,12 +1,11 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.data.datasource
+package com.artem_obrazumov.mycontacts.common.feature.contacts.data.datasource
 
 import android.content.Context
 import android.provider.ContactsContract
 import com.artem_obrazumov.mycontacts.R
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.datasource.ContactsDataSource
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model.Contact
 import com.artem_obrazumov.mycontacts.core.domain.StringResource
-import com.artem_obrazumov.mycontacts.core.presentation.resources.resolve
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.datasource.ContactsDataSource
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.Contact
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -111,19 +110,5 @@ class ContactsDataSourceImpl(
 
     override suspend fun getContacts(): List<Contact> = withContext(Dispatchers.IO) {
         return@withContext getAllContacts().apply { markDuplicates(this) }
-    }
-
-    override suspend fun getDuplicateContactIds(): List<Long> {
-        val contacts = getAllContacts()
-        val ids = mutableListOf<Long>()
-        val contactsSet = mutableSetOf<Contact>()
-        contacts.forEach { contact ->
-            if (contact in contactsSet) {
-                ids.add(contact.rawId)
-            } else {
-                contactsSet.add(contact)
-            }
-        }
-        return ids
     }
 }

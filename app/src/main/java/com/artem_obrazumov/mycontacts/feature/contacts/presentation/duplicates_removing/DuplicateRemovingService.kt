@@ -5,7 +5,9 @@ import android.content.Intent
 import android.os.IBinder
 import android.provider.ContactsContract
 import com.artem_obrazumov.mycontacts.app.MyContactsApp
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase.GetDuplicateContactsIdUseCase
+import com.artem_obrazumov.mycontacts.common.feature.contacts.aidl.DuplicateRemovingServiceCallback
+import com.artem_obrazumov.mycontacts.common.feature.contacts.aidl.IDuplicateRemovingService
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase.GetDuplicateContactsIdUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

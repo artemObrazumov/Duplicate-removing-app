@@ -1,10 +1,10 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.data.datasource
+package com.artem_obrazumov.mycontacts.common.feature.contacts.data.datasource
 
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.datasource.ContactsPermissionDataSource
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.datasource.ContactsPermissionDataSource
 
 class ContactsPermissionDataSourceImpl(
     private val context: Context

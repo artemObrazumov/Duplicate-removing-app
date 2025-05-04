@@ -34,13 +34,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.artem_obrazumov.mycontacts.R
+import com.artem_obrazumov.mycontacts.common.feature.contacts.aidl.DuplicateRemovingServiceCallback
+import com.artem_obrazumov.mycontacts.common.feature.contacts.aidl.IDuplicateRemovingService
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model.Contact
 import com.artem_obrazumov.mycontacts.core.presentation.screens.LoadingScreen
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.Contact
 import com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list.components.ContactItem
 import com.artem_obrazumov.mycontacts.feature.contacts.presentation.contacts_list.components.LetterHeader
 import com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.DuplicateRemovingService
-import com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.DuplicateRemovingServiceCallback
-import com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing.IDuplicateRemovingService
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable

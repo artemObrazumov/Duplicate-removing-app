@@ -1,4 +1,4 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.domain.datasource
+package com.artem_obrazumov.mycontacts.common.feature.contacts.domain.datasource
 
 interface ContactsPermissionDataSource {
 

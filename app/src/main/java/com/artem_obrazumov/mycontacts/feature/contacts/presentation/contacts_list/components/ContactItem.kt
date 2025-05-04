@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.artem_obrazumov.mycontacts.R
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model.Contact
 import com.artem_obrazumov.mycontacts.core.presentation.resources.resolve
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.model.Contact
 
 @Composable
 fun ContactItem(

@@ -1,4 +1,4 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.presentation.duplicates_removing;
+package com.artem_obrazumov.mycontacts.common.feature.contacts.aidl;
 
 interface DuplicateRemovingServiceCallback {
     void onCleanStarted(int duplicates);

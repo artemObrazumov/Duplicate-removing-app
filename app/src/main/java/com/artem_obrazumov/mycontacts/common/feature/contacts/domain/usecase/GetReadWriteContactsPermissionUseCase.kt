@@ -1,6 +1,6 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.domain.usecase
+package com.artem_obrazumov.mycontacts.common.feature.contacts.domain.usecase
 
-import com.artem_obrazumov.mycontacts.feature.contacts.domain.repository.ContactsRepository
+import com.artem_obrazumov.mycontacts.common.feature.contacts.domain.repository.ContactsRepository
 
 class GetReadWriteContactsPermissionUseCase(
     private val contactsRepository: ContactsRepository

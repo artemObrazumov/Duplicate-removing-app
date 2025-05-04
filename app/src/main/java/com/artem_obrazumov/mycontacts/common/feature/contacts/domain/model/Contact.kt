@@ -1,4 +1,4 @@
-package com.artem_obrazumov.mycontacts.feature.contacts.domain.model
+package com.artem_obrazumov.mycontacts.common.feature.contacts.domain.model
 
 import com.artem_obrazumov.mycontacts.core.domain.StringResource
 
