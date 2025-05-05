@@ -35,11 +35,6 @@ class ContactsDataSourceImpl(
         )?.use { cursor ->
             while (cursor.moveToNext()) {
                 try {
-                    val id = cursor.getLong(
-                        cursor.getColumnIndexOrThrow(
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID
-                        )
-                    )
                     val rawId = cursor.getLong(
                         cursor.getColumnIndexOrThrow(
                             ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID

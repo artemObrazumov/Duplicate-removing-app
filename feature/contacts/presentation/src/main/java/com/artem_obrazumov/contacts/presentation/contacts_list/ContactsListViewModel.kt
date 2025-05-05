@@ -30,7 +30,7 @@ class ContactsListViewModel(
         tryLoadContacts()
     }
 
-    private suspend fun updateContentState() {
+    private fun updateContentState() {
         updateState(
             ContactsListScreenState.Content(
                 contactsListState,
