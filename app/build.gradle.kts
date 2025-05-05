@@ -2,8 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlin-kapt")
-    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -49,37 +49,26 @@ android {
 
 dependencies {
 
-    // Android extensions
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    // modules
+    implementation(project(Modules.Core.Domain))
+    implementation(project(Modules.Core.Presentation))
+    implementation(project(Modules.Common.Feature.Contacts.Data))
+    implementation(project(Modules.Common.Feature.Contacts.Domain))
+    implementation(project(Modules.Common.Feature.Contacts.Aidl))
+    implementation(project(Modules.Feature.Contacts.Presentation))
+    implementation(project(Modules.Feature.Contacts.DuplicatesCleaning))
 
-    // Compose
-    implementation(libs.androidx.activity.compose)
+    // bom
     implementation(platform(libs.androidx.compose.bom))
 
-    // Serialization
-    implementation(libs.kotlinx.serialization.json)
-
-    // Coil
-    implementation(libs.coil.compose)
-
-    // Dagger
-    implementation(libs.dagger)
-    kapt(libs.dagger.compiler)
-
-    // Navigation
-    implementation(libs.compose.navigation)
-
-    // Testing
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    // bundles
+    implementation(libs.bundles.android.base)
+    implementation(libs.bundles.compose.core)
+    implementation(libs.bundles.dagger)
+    kapt(libs.bundles.dagger.compiler)
+    implementation(libs.bundles.navigation)
+    implementation(libs.bundles.serialization)
+    debugImplementation(libs.bundles.compose.debug)
+    testImplementation(libs.bundles.testing)
+    testImplementation(libs.bundles.testing.android)
 }
