@@ -38,6 +38,10 @@
 
 # Демонстрация
 
+## Apk файл
+
+[Скачать APK](./mycontacts.apk)
+
 ## Скриншоты
 
 <img src="img/screenshots/1.png" width="250">
