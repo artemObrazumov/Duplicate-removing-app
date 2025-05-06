@@ -19,12 +19,9 @@ class ContactsDataSourceImpl(
         val contacts = mutableListOf<Contact>()
         val uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
         val projection = arrayOf(
-            ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
             ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID,
             ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-            ContactsContract.CommonDataKinds.Phone.NUMBER,
             ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
-            ContactsContract.CommonDataKinds.Phone.TYPE
         )
         val sortOrder = "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC"
 

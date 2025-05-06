@@ -3,7 +3,6 @@ package com.artem_obrazumov.contacts.presentation.contacts_list
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,13 +28,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.artem_obrazumov.contacts.presentation.R
-import com.artem_obrazumov.presentation.resources.resolve
-import com.artem_obrazumov.presentation.screens.LoadingScreen
 import com.artem_obrazumov.contacts.presentation.contacts_list.components.ContactItem
 import com.artem_obrazumov.contacts.presentation.contacts_list.components.DuplicateCleaningServiceItem
 import com.artem_obrazumov.contacts.presentation.contacts_list.components.LetterHeader
 import com.artem_obrazumov.contacts.presentation.contacts_list.components.ServiceEffect
 import com.artem_obrazumov.contacts.presentation.utils.toStringResource
+import com.artem_obrazumov.presentation.resources.resolve
+import com.artem_obrazumov.presentation.screens.LoadingScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -114,7 +113,6 @@ fun ContactsListScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ContactsListScreenContent(
     state: ContactsListScreenState.ContactsListState,
@@ -135,8 +133,7 @@ fun ContactsListScreenContent(
                     }
 
                     items(
-                        items = contacts,
-                        key = { it.rawId }
+                        items = contacts
                     ) { contact ->
                         ContactItem(
                             contact = contact,
